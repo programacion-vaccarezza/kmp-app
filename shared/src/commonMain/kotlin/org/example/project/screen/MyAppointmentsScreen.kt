@@ -1,7 +1,9 @@
 package org.example.project.screen
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,6 +23,11 @@ class MyAppointmentsScreen {
             Text(
                 text = "Mis turnos",
                 style = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = "No tenés turnos",
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
