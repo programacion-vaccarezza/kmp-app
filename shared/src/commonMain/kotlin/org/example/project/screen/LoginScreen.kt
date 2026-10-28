@@ -68,7 +68,9 @@ class LoginScreen : Screen {
             )
             Spacer(Modifier.height(16.dp))
             Button(
-                onClick = { },
+                onClick = {
+                    navigator.replaceAll(MainScreen())
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
