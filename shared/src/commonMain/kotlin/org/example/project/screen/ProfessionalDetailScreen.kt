@@ -47,7 +47,9 @@ class ProfessionalDetailScreen : Screen {
             )
             Spacer(Modifier.height(16.dp))
             Button(
-                onClick = { },
+                onClick = {
+                    navigator.push(AppointmentScreen())
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
