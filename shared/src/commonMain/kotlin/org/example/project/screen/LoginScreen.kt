@@ -16,6 +16,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -26,6 +28,13 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import io.ktor.client.call.body
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.launch
+import org.example.project.network.CatalogoApiService
+import org.example.project.network.Session
+import org.example.project.network.model.LoginRequest
+import org.example.project.network.model.LoginResponse
 
 class LoginScreen : Screen {
 
@@ -36,6 +45,43 @@ class LoginScreen : Screen {
 
         var login by rememberSaveable { mutableStateOf("") }
         var password by rememberSaveable { mutableStateOf("") }
+
+        val scope = rememberCoroutineScope()
+        val apiService = remember { CatalogoApiService() }
+        var isLoading by remember { mutableStateOf(false) }
+        var errorMessage by remember {
+            mutableStateOf(if (Session.expired) "Tu sesión venció, volvé a iniciar sesión" else null)
+        }
+
+        fun login() {
+            scope.launch {
+                isLoading = true
+                errorMessage = null
+                try {
+                    val response = apiService.login(
+                        LoginRequest(
+                            login = login,
+                            password = password
+                        )
+                    )
+                    when (response.status) {
+                        HttpStatusCode.OK -> {
+                            Session.token = response.body<LoginResponse>().token
+                            Session.login = login
+                            Session.expired = false
+                            navigator.replaceAll(MainScreen())
+                        }
+                        HttpStatusCode.Unauthorized -> errorMessage = "Usuario o contraseña incorrectos"
+                        HttpStatusCode.BadRequest -> errorMessage = "Completá el usuario y la contraseña"
+                        else -> errorMessage = "No se pudo iniciar sesión"
+                    }
+                } catch (e: Exception) {
+                    errorMessage = "No se pudo conectar con el servidor"
+                } finally {
+                    isLoading = false
+                }
+            }
+        }
 
         Column(
             modifier = Modifier
@@ -68,13 +114,19 @@ class LoginScreen : Screen {
             )
             Spacer(Modifier.height(16.dp))
             Button(
-                onClick = {
-                    navigator.replaceAll(MainScreen())
-                },
+                onClick = { login() },
+                enabled = !isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = "Ingresar"
+                    text = if (isLoading) "Ingresando..." else "Ingresar"
+                )
+            }
+            errorMessage?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error
                 )
             }
             TextButton(

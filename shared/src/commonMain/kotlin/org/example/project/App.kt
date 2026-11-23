@@ -2,16 +2,31 @@ package org.example.project
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.LaunchedEffect
+import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
+import org.example.project.network.ApiConfig
+import org.example.project.network.Session
 import org.example.project.screen.LoginScreen
 
 @Composable
-@Preview
-fun App() {
+fun App(
+    catalogoBaseUrl: String,
+    turnosBaseUrl: String
+) {
+    ApiConfig.catalogoBaseUrl = catalogoBaseUrl
+    ApiConfig.turnosBaseUrl = turnosBaseUrl
+
     MaterialTheme {
         Navigator(
             screen = LoginScreen()
-        )
+        ) { navigator ->
+            LaunchedEffect(Session.expired) {
+                if (Session.expired) {
+                    navigator.replaceAll(LoginScreen())
+                }
+            }
+            CurrentScreen()
+        }
     }
 }
