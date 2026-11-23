@@ -2,6 +2,8 @@ package org.example.project.network
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.bearerAuth
 import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -16,6 +18,9 @@ object NetworkUtils {
                 },
                 contentType = ContentType.Any
             )
+        }
+        defaultRequest {
+            Session.token?.let { bearerAuth(it) }
         }
     }
 }
