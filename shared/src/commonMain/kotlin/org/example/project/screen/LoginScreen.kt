@@ -49,7 +49,9 @@ class LoginScreen : Screen {
         val scope = rememberCoroutineScope()
         val apiService = remember { CatalogoApiService() }
         var isLoading by remember { mutableStateOf(false) }
-        var errorMessage by remember { mutableStateOf<String?>(null) }
+        var errorMessage by remember {
+            mutableStateOf(if (Session.expired) "Tu sesión venció, volvé a iniciar sesión" else null)
+        }
 
         fun login() {
             scope.launch {
@@ -66,6 +68,7 @@ class LoginScreen : Screen {
                         HttpStatusCode.OK -> {
                             Session.token = response.body<LoginResponse>().token
                             Session.login = login
+                            Session.expired = false
                             navigator.replaceAll(MainScreen())
                         }
                         HttpStatusCode.Unauthorized -> errorMessage = "Usuario o contraseña incorrectos"
