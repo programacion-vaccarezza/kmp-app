@@ -10,9 +10,13 @@ object Session {
     var login: String? = null
     var expired by mutableStateOf(false)
 
-    fun expire() {
+    fun clear() {
         token = null
         login = null
+    }
+
+    fun expire() {
+        clear()
         expired = true
     }
 }

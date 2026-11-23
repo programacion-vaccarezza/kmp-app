@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import org.example.project.network.Session
 
 class ProfileScreen {
 
@@ -33,8 +34,14 @@ class ProfileScreen {
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(Modifier.height(16.dp))
+            Text(
+                text = "Usuario: ${Session.login ?: ""}",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            Spacer(Modifier.height(16.dp))
             Button(
                 onClick = {
+                    Session.clear()
                     navigator.replaceAll(LoginScreen())
                 },
                 modifier = Modifier.fillMaxWidth()
